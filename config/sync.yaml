@@ -1,0 +1,38 @@
+primary_db:
+  url: postgresql://aklamaash:akla123@localhost:5433/auth_db?sslmode=disable
+
+replica_dbs:
+  - name: replica_1
+    url: postgresql://aklamaash:akla123@localhost:5433/infrastructure_db?sslmode=disable
+
+tables:
+  users:
+    primary_key: id
+    mode: upsert
+    batch_size: 10000
+    
+    columns_to_sync:
+      - user_name
+      - email
+      - metadata
+      - updated_at
+      - profile_url
+
+    column_mapping:
+      # Mapping only needed if primary and replica column names differ
+      # primary_col: replica_col
+      # email_address: email
+
+    conflict_resolution:
+      update_columns:
+        - user_name
+        - email
+        - updated_at
+        - metadata
+        - profile_url
+
+    checksum:
+      enabled: true
+      columns:
+        - user_name
+        - email
