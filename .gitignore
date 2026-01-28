@@ -1,1 +1,7 @@
 venv/
+*.pyc
+__pycache__/
+.sync_state.json
+dist/
+*.egg-info/
+test_sync.yaml
