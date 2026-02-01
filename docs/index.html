@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SyncSet | Database Replication Made Simple</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg: #030712;
+            --surface: #111827;
+            --accent: #3b82f6;
+            --accent-glow: rgba(59, 130, 246, 0.5);
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --code-bg: #1f2937;
+            --glass: rgba(17, 24, 39, 0.7);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* Hero Section */
+        header {
+            height: 60vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background: radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.15) 0%, transparent 70%);
+            position: relative;
+        }
+
+        h1 {
+            font-size: 5rem;
+            font-weight: 800;
+            letter-spacing: -2px;
+            margin-bottom: 1rem;
+            background: linear-gradient(to bottom right, #fff, #9ca3af);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .badge {
+            background: var(--accent);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 2rem;
+            box-shadow: 0 0 20px var(--accent-glow);
+        }
+
+        .subtitle {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            max-width: 600px;
+        }
+
+        /* Sections */
+        section {
+            padding: 6rem 0;
+        }
+
+        h2 {
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            color: #fff;
+        }
+
+        /* Glass Cards */
+        .card {
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 2.5rem;
+            border-radius: 24px;
+            margin-bottom: 2rem;
+        }
+
+        /* Code Blocks */
+        pre {
+            background: var(--code-bg);
+            padding: 1.5rem;
+            border-radius: 12px;
+            font-family: 'JetBrains Mono', monospace;
+            overflow-x: auto;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            margin: 1rem 0;
+        }
+
+        code {
+            color: #60a5fa;
+            font-size: 0.95rem;
+        }
+
+        .copy-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: none;
+            color: var(--text-muted);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.2s;
+        }
+
+        .copy-btn:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Features */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            border-left: 4px solid var(--accent);
+        }
+
+        .feature-card h3 {
+            margin-bottom: 1rem;
+        }
+
+        /* Footer */
+        footer {
+            padding: 4rem 0;
+            text-align: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate {
+            animation: fadeIn 0.8s ease-out forwards;
+        }
+
+        .delay-1 {
+            animation-delay: 0.2s;
+        }
+
+        .delay-2 {
+            animation-delay: 0.4s;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div class="badge animate">v0.2.0 Experimental</div>
+        <h1 class="animate delay-1">SyncSet</h1>
+        <p class="subtitle animate delay-2">Seamlessly replicate databases across instances with high-performance
+            batching and smart conflict resolution.</p>
+    </header>
+
+    <div class="container">
+        <section id="installation">
+            <h2>Quick Start</h2>
+            <div class="card animate">
+                <p>Install SyncSet directly from PyPI:</p>
+                <pre><code>pip install syncset-db</code></pre>
+            </div>
+        </section>
+
+        <section id="usage">
+            <h2>Usage</h2>
+            <div class="card">
+                <p>Configure your replication settings in a YAML file and run the syncer using the <code>--file</code>
+                    flag:</p>
+                <pre><code># Test your configuration
+syncset --file=sync.yaml --dry-run
+
+# Run the replication
+syncset --file=sync.yaml</code></pre>
+
+                <h3 style="margin-top: 2rem; margin-bottom: 1rem;">Example Configuration</h3>
+                <pre><code>primary_db:
+  url: "postgresql://user:pass@localhost:5432/primary"
+
+replica_dbs:
+  - name: replica_1
+    url: "postgresql://user:pass@localhost:5433/replica"
+
+tables:
+  users:
+    primary_key: id
+    mode: upsert
+    batch_size: 5000</code></pre>
+            </div>
+        </section>
+
+        <section id="features">
+            <h2>Key Features</h2>
+            <div class="grid">
+                <div class="card feature-card">
+                    <h3>Multi-Table Sync</h3>
+                    <p>Replicate multiple tables simultaneously from a single primary to multiple replicas.</p>
+                </div>
+                <div class="card feature-card">
+                    <h3>Smart Upsert</h3>
+                    <p>High-performance conflict resolution using Postgres native <code>ON CONFLICT</code> logic.</p>
+                </div>
+                <div class="card feature-card">
+                    <h3>Batch Processing</h3>
+                    <p>Memory-efficient streaming and batching for handling millions of rows effortlessly.</p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <footer>
+        <p>&copy; Mohamed Aklamaash</p>
+    </footer>
+
+</body>
+
+</html>

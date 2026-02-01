@@ -6,25 +6,6 @@ A high-performance, resilient PostgreSQL data replication service designed for s
 
 This service facilitates the replication of specific tables and columns from a primary PostgreSQL database to one or more replica databases. It is built for scenarios where you need to maintain specialized read replicas or sync data across microservices while maintaining strictly controlled schemas.
 
-## Key Features
-
-- **Selective Replication**: Sync only the tables and columns you need.
-- **Robust Schema Evolution**: Automatically detects missing columns or indexes on replicas and adds them using `ALTER TABLE` without data loss.
-- **Intelligent Upserts**: Uses PostgreSQL's `ON CONFLICT` logic to efficiently handle updates and inserts in a single pass.
-- **Incremental Sync**: Tracks synchronization state via high-watermark primary keys to ensure only new or modified data is processed.
-- **Data Integrity**: Optional checksum-based validation to ensure rows are truly identical before skipping them.
-- **Multi-Replica Support**: Synchronize the same primary data to multiple independent targets in parallel.
-- **Dry-Run Mode**: Safely preview schema changes and data movements before execution.
-
-## Architecture
-
-The synchronization follows a batched extraction and load pattern:
-1. **Extract**: Fetch records from the primary database ordered by the primary key, starting from the last known state.
-2. **Transform**: Apply column mappings and filter out any columns not intended for the replica.
-3. **Validate**: Perform checksum comparisons (if enabled) against existing replica data to minimize redundant writes.
-4. **Load**: Execute bulk upserts or inserts into the replica database.
-5. **State Update**: Persist the highest processed primary key to `.sync_state.json`.
-
 ## Configuration
 
 The service is configured via `config/sync.yaml`.
@@ -67,6 +48,15 @@ tables:
       columns:
         - email
         - username
+
+  orders:
+    primary_key: order_id
+    mode: insert
+    batch_size: 5000
+    columns_to_sync:
+      - customer_id
+      - total_amount
+      - status
 ```
 
 ## Getting Started
@@ -76,28 +66,50 @@ tables:
 - PostgreSQL instances (Primary and Replica)
 
 ### Installation
-1. Clone the repository and navigate to the directory.
-2. Create and activate a virtual environment:
-   ```bash
-   python3 -m venv venv
-   source venv/bin/activate
-   ```
-3. Install dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
+
+You can install `syncset-db` using pip:
+
+```bash
+pip install syncset-db
+```
 
 ### Running the Service
 
-**Dry Run (Recommended first step):**
+You can run the service using the globally installed `syncset` command or directly via the script.
+
+**Using the CLI tool:**
 ```bash
-python3 cli.py --dry-run
+# Run with a custom configuration file (Recommended)
+syncset --file=sync.yaml
+
+# Run with custom config and dry-run mode
+syncset --file=sync.yaml --dry-run
 ```
 
-**Start Synchronization:**
+If you don't provide a file, it defaults to `config/sync.yaml`.
+
+**Using Python directly:**
 ```bash
-python3 cli.py
+# Start Sync
+python3 cli.py --file=sync.yaml
+
+# Dry Run
+python3 cli.py --file=sync.yaml --dry-run
 ```
+
+## Key Features
+
+- **Selective Replication**: Sync only the tables and columns you need.
+- **Incremental Sync**: Tracks synchronization state via high-watermark primary keys to ensure only new or modified data is processed.
+- **Data Integrity**: Optional checksum-based validation to ensure rows are truly identical before skipping them.
+- **Multi-Replica Support**: Synchronize the same primary data to multiple independent targets in parallel.
+
+## Architecture
+
+The synchronization follows a batched extraction and load pattern:
+1. **Validate**: Perform checksum comparisons (if enabled) against existing replica data to minimize redundant writes.
+4. **Load**: Execute bulk upserts or inserts into the replica database.
+5. **State Update**: Persist the highest processed primary key to `.sync_state.json`.
 
 ## State Management
 Replication progress is stored in `.sync_state.json`. To re-trigger a full synchronization for a specific table, simply remove its entry from this file or delete the file entirely.
